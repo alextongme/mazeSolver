@@ -1,9 +1,8 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
-// ctx.fillStyle = 'green';
-// ctx.fillRect(0, 80, 200, 100);
+const canvasDFS = document.getElementById('canvas-dfs');
+const canvasBFS = document.getElementById('canvas-bfs');
+const ctxDFS = canvasDFS.getContext('2d');
+const ctxBFS = canvasBFS.getContext('2d');
 
 const makeDelayedExec = (time) => {
     const queue = [];
@@ -24,7 +23,7 @@ const makeDelayedExec = (time) => {
     return delayedPrint;
 };
 
-const delayedExec = makeDelayedExec(50);
+const delayedExec = makeDelayedExec(10);
 
 const POSITION_SIZE = 50;
 const OPPOSITE_DIRECTION = {
@@ -35,7 +34,8 @@ const OPPOSITE_DIRECTION = {
 };
 
 class Maze {
-    constructor(size) { // size # rows / # cols
+    constructor(size, ctx) {
+        this.ctx = ctx
         this.grid = this.initializeGrid(size)
         this.generate();
         this.start = [0, 0];
@@ -66,61 +66,36 @@ class Maze {
     paint() {
         for(let i = 0; i < this.grid.length; i++) {
             for(let j = 0; j < this.grid[0].length; j++) {
-                    // color node
+
                     let currNode = this.grid[i][j];
                     if(currNode.start === true) {
-                        ctx.fillStyle = 'blue';
+                        this.ctx.fillStyle = 'blue';
                     } else if (currNode.end === true) {
-                        ctx.fillStyle = 'orange';
+                        this.ctx.fillStyle = 'orange';
                     } else {
-                        ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = 'white';
                     }
     
                     let x = POSITION_SIZE * j * 2;
                     let y = POSITION_SIZE * i * 2;
-                    ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
-                    
-                    // color edges
+                    this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
+
                     if(currNode.up === true) {
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.down === true) {
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.left === true) {
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.right === true) {
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                     }
-            }
-        }
-    }
-    
-    // myMaze.paintKeys(visitedKeys, 'red');
-    paintVisited(keys, color) { // keys = {  '1,0':'left',    }
-        for (let key in keys) {
-            const [row, col] = this.keyToPosition(key);
-            const x = POSITION_SIZE * col * 2;
-            const y = POSITION_SIZE * row * 2;
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
-            
-            if(keys[key] === 'up') {
-                ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
-            }
-            if(keys[key] === 'down') {
-                ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
-            }
-            if(keys[key] === 'left') {
-                ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
-            }
-            if(keys[key] === 'right') {
-                ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
             }
         }
     }
@@ -133,20 +108,20 @@ class Maze {
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    ctx.fillStyle = color;
-                    ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
+                    this.ctx.fillStyle = color;
+                    this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 } 
                 if(dir === 'up') { 
-                    ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                    this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if(dir === 'down') {
-                    ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                    this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if(dir === 'left') {
-                    ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                    this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if(dir === 'right') {
-                    ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                    this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
             })
         }
@@ -194,6 +169,7 @@ class Maze {
             });
         }
     }
+
     // https://docs.google.com/drawings/d/1a0sk5EG8xGBJNUYUigDf6gBdIhwUuU6OJKhQFCjGBJc/edit?usp=sharing
     getEdges(row, col) {
         const edges = []
@@ -236,10 +212,7 @@ class Maze {
 
         return activeNeighbors;
     }
-    // getNeighbors('1,1'); => {  '1,0':'left',    }
 
-
-    // .getNeighbors(1, 1); // [ [0, 1], [2, 1]]
     positionToKey(row, col) {
         return row + ',' + col;
     }
@@ -253,29 +226,27 @@ class Maze {
             return [];
         }
 
-        // visited.add(currKey);
         visited[currKey] = dir;
 
-        //call delayedExec
         delayedExec(() => {
             const [row, col] = this.keyToPosition(currKey);
             const x = POSITION_SIZE * col * 2;
             const y = POSITION_SIZE * row * 2;
             if(this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                ctx.fillStyle = "red";
-                ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
+                this.ctx.fillStyle = "red";
+                this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
             }
             if(dir === 'up') { 
-                ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
             }
             if(dir === 'down') {
-                ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
             }
             if(dir === 'left') {
-                ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
             }
             if(dir === 'right') {
-                ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
             }
         })
 
@@ -293,12 +264,65 @@ class Maze {
 
         return [];
     }
-};
-// if (key in obj)
-//  { '1,0': 'right' }
 
-// .neighbors(0, 0)
-//   [ [ '0,0', 'right', '0,1'], [ '0,0', 'down', '1,0' ]]
+    breadthFirstSearch(startKey, targetKey, visited = {}) {
+        let queue = [[startKey, null]];
+        let parents = {[startKey]: null };
+        visited[startKey] = null;
+
+        while(queue.length > 0) {
+            const currKeyAndDir = queue.pop(0);
+            const currKey = currKeyAndDir[0];
+            const dir = currKeyAndDir[1];
+            
+            delayedExec(() => {
+         
+                const [row, col] = this.keyToPosition(currKey);
+                
+                const x = POSITION_SIZE * col * 2;
+                const y = POSITION_SIZE * row * 2;
+                if(this.grid[row][col].start === false && this.grid[row][col].end === false) {
+                    this.ctx.fillStyle = "red";
+                    this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
+                }
+
+                if(dir === 'up') { 
+                    this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'down') {
+                    this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'left') {
+                    this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'right') {
+                    this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                }
+            });
+
+            if(currKey === targetKey) {
+                let path = []
+                let node = currKey
+                while(node !== null) {
+                    if(node !== '0,0') {
+                        path.unshift([node, visited[node]])
+                    }
+                    node = parents[node]
+                }
+                return path
+            };
+
+            const neighbors = this.getNeighbors(currKey);
+            for(let neighbor in neighbors) {
+                if(!(neighbor in visited)) {
+                    queue.push([neighbor, neighbors[neighbor]])
+                    parents[neighbor] = currKey
+                    visited[neighbor] = neighbors[neighbor];
+                }
+            }
+        }
+    }
+};
 
 class Node {
     constructor() {
@@ -315,9 +339,15 @@ const getRandomIndex = (arr) => {
     return Math.floor(Math.random() * arr.length)
 };
 
-const myMaze = new Maze(12);
-myMaze.paint(); // 
-const correctPath = myMaze.depthFirstSearch('0,0', '11,11');
-console.log(correctPath)
-myMaze.paintCorrectPath(correctPath, 'green');
-// myMaze.paintVisited(visited, 'red');
+const mazeDFS = new Maze(12, ctxDFS);
+const mazeBFS = new Maze(12, ctxBFS);
+
+mazeDFS.paint();
+mazeBFS.paint();
+
+const dfsPath = mazeDFS.depthFirstSearch('0,0', '11,11');
+
+const bfsPath = mazeBFS.breadthFirstSearch('0,0', '11,11');
+
+mazeDFS.paintCorrectPath(dfsPath, 'green');
+mazeBFS.paintCorrectPath(bfsPath, 'green');
