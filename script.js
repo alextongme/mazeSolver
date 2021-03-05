@@ -1,8 +1,16 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
 const canvasDFS = document.getElementById('canvas-dfs');
 const canvasBFS = document.getElementById('canvas-bfs');
-const ctxDFS = canvasDFS.getContext('2d');
-const ctxBFS = canvasBFS.getContext('2d');
+const canvasBDS = document.getElementById('canvas-bds');
+const refresh = document.getElementById('refresh');
+const speedText = document.getElementById('speed');
+
+const incrementSpeed = document.getElementById('increment');
+const decrementSpeed = document.getElementById('decrement');
+
+let ctxDFS = canvasDFS.getContext('2d');
+let ctxBFS = canvasBFS.getContext('2d');
+let ctxBDS = canvasBDS.getContext('2d');
 
 const makeDelayedExec = (time) => {
     const queue = [];
@@ -15,7 +23,9 @@ const makeDelayedExec = (time) => {
       if (queue.length) {
         const fn = queue.shift();
         fn();
+        refresh.setAttribute('disabled', true);
       } else {
+        refresh.removeAttribute('disabled');
         clearInterval(intervalId);
       }
     }, time);
@@ -23,9 +33,15 @@ const makeDelayedExec = (time) => {
     return delayedPrint;
 };
 
-const delayedExec = makeDelayedExec(10);
+let speed = 10;
 
-const POSITION_SIZE = 50;
+speedText.innerHTML = speed;
+
+let delayedExecDfs = makeDelayedExec(speed);
+let delayedExecBfs = makeDelayedExec(speed);
+let delayedExecBds = makeDelayedExec(speed);
+
+const POSITION_SIZE = 5;
 const OPPOSITE_DIRECTION = {
     left: 'right',
     right: 'left',
@@ -33,14 +49,29 @@ const OPPOSITE_DIRECTION = {
     up: 'down'
 };
 
+
 class Maze {
-    constructor(size, ctx) {
+    constructor(size, ctx, delayedExec) {
+        this.delayedExec = delayedExec
         this.ctx = ctx
         this.grid = this.initializeGrid(size)
-        this.generate();
-        this.start = [0, 0];
-        this.end = [size - 1, size - 1];
+        this.start = [getRandomIndex(this.grid[0]), getRandomIndex(this.grid[0])];
+        this.end = [getRandomIndex(this.grid[0]), getRandomIndex(this.grid[0])];
+        this.size = size;
+
+        this.grid[this.start[0]][this.start[1]].start = true;
+        this.grid[this.end[0]][this.end[1]].end = true;
+        
     };
+
+    static clone(maze, ctx, delayedExec) {
+        const clonedMaze = new Maze(maze.size, ctx)
+        clonedMaze.grid = maze.grid
+        clonedMaze.start = maze.start
+        clonedMaze.end = maze.end
+        clonedMaze.delayedExec = delayedExec
+        return clonedMaze
+    }
 
     initializeGrid(size) {
         const newGrid = [];
@@ -52,9 +83,6 @@ class Maze {
             }
             newGrid.push(row);
         };
-        
-        newGrid[0][0].start = true;
-        newGrid[size - 1][size - 1].end = true;
         
         return newGrid;
     };
@@ -69,11 +97,11 @@ class Maze {
 
                     let currNode = this.grid[i][j];
                     if(currNode.start === true) {
-                        this.ctx.fillStyle = 'blue';
+                        this.ctx.fillStyle = '#FFFF00';
                     } else if (currNode.end === true) {
-                        this.ctx.fillStyle = 'orange';
+                        this.ctx.fillStyle = '#39ff14';
                     } else {
-                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = '#eae2b7';
                     }
     
                     let x = POSITION_SIZE * j * 2;
@@ -81,19 +109,19 @@ class Maze {
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
 
                     if(currNode.up === true) {
-                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = '#eae2b7';
                         this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.down === true) {
-                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = '#eae2b7';
                         this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.left === true) {
-                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = '#eae2b7';
                         this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                     }
                     if(currNode.right === true) {
-                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillStyle = '#eae2b7';
                         this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                     }
             }
@@ -103,7 +131,7 @@ class Maze {
     paintCorrectPath(keys, color) { // keys = {  '1,0':'left',    }
         for(let key of keys) {
             const [currKey, dir] = key;
-            delayedExec(() => {
+            this.delayedExec(() => {
                 const [row, col] = this.keyToPosition(currKey);
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
@@ -221,19 +249,19 @@ class Maze {
         return key.split(',').map(Number);
     }
 
-    depthFirstSearch(currKey, targetKey, dir = null, visited = {} ) {
+    depthFirstSearch(currKey = this.start.join(','), targetKey = this.end.join(','), dir = null, visited = {} ) {
         if (currKey in visited) {
             return [];
         }
 
         visited[currKey] = dir;
 
-        delayedExec(() => {
+        this.delayedExec(() => {
             const [row, col] = this.keyToPosition(currKey);
             const x = POSITION_SIZE * col * 2;
             const y = POSITION_SIZE * row * 2;
             if(this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                this.ctx.fillStyle = "red";
+                this.ctx.fillStyle = "#f77f00";
                 this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
             }
             if(dir === 'up') { 
@@ -265,24 +293,92 @@ class Maze {
         return [];
     }
 
-    breadthFirstSearch(startKey, targetKey, visited = {}) {
+    breadthFirstSearch(startKey = this.start.join(','), targetKey = this.end.join(','), visited = {}) {
         let queue = [[startKey, null]];
         let parents = {[startKey]: null };
         visited[startKey] = null;
 
         while(queue.length > 0) {
-            const currKeyAndDir = queue.pop(0);
+            const currKeyAndDir = queue.shift();
             const currKey = currKeyAndDir[0];
             const dir = currKeyAndDir[1];
             
-            delayedExec(() => {
-         
+            this.delayedExec(() => {
                 const [row, col] = this.keyToPosition(currKey);
-                
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if(this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    this.ctx.fillStyle = "red";
+                    this.ctx.fillStyle = "#f77f00";
+                    this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
+                }
+
+                if(dir === 'up') { 
+                    this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'down') {
+                    this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'left') {
+                    this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                }
+                if(dir === 'right') {
+                    this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
+                }
+            });
+           
+
+            if(currKey === targetKey) {
+                let path = []
+                let node = currKey
+                while(node !== null) {
+                    if(node !== this.start.join(',')) {
+                        path.unshift([node, visited[node]])
+                    }
+                    node = parents[node]
+                }
+                return path
+            };
+
+            
+
+            const neighbors = this.getNeighbors(currKey);
+            for(let neighbor in neighbors) {
+                if(!(neighbor in visited)) {
+                    queue.push([neighbor, neighbors[neighbor]])
+                    parents[neighbor] = currKey
+                    visited[neighbor] = neighbors[neighbor];
+                }
+            }
+        }
+    }
+
+    bidirectionalSearch(startKey = this.start.join(','), targetKey = this.end.join(',')) {
+        const startVisited = {};
+        const startQueue = [[startKey, null]];
+        startVisited[startKey] = null;
+
+        const endVisited = {};
+        const endQueue = [[targetKey, null]];
+        endVisited[targetKey] = null;
+
+        let currQueue = startQueue;
+        let currVisited = startVisited;
+
+        let startParents = {[startKey]: null };
+        let endParents = {[targetKey]: null };
+        let currParents = startParents;
+
+        while(currQueue.length > 0) {
+            const currKeyAndDir = currQueue.shift();
+            const currKey = currKeyAndDir[0];
+            const dir = currKeyAndDir[1];
+
+            this.delayedExec(() => {
+                const [row, col] = this.keyToPosition(currKey);
+                const x = POSITION_SIZE * col * 2;
+                const y = POSITION_SIZE * row * 2;
+                if(this.grid[row][col].start === false && this.grid[row][col].end === false) {
+                    this.ctx.fillStyle = "#f77f00";
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 }
 
@@ -300,26 +396,40 @@ class Maze {
                 }
             });
 
-            if(currKey === targetKey) {
-                let path = []
-                let node = currKey
-                while(node !== null) {
-                    if(node !== '0,0') {
-                        path.unshift([node, visited[node]])
-                    }
-                    node = parents[node]
-                }
-                return path
-            };
-
             const neighbors = this.getNeighbors(currKey);
             for(let neighbor in neighbors) {
-                if(!(neighbor in visited)) {
-                    queue.push([neighbor, neighbors[neighbor]])
-                    parents[neighbor] = currKey
-                    visited[neighbor] = neighbors[neighbor];
+                if(!(neighbor in currVisited)) {
+                    currQueue.push([neighbor, neighbors[neighbor]])
+                    currParents[neighbor] = currKey
+                    currVisited[neighbor] = neighbors[neighbor];
                 }
             }
+
+            if (currKey in startVisited && currKey in endVisited) {
+                let startPath = [];
+                let endPath = [];
+                let startNode = currKey;
+                let endNode = currKey;
+
+                while(startNode !== null) {
+                    if(startNode !== this.start.join(',')) {
+                        startPath.unshift([startNode, startVisited[startNode]])
+                    }
+                    startNode = startParents[startNode]
+                }
+
+                while(endNode !== null) {
+                    if(endNode !== this.end.join(',')) {
+                        endPath.unshift([endNode, endVisited[endNode]])
+                    }
+                    endNode = endParents[endNode]
+                }
+
+                return startPath.concat(endPath);
+            }
+            currVisited = currVisited === startVisited ? endVisited : startVisited;
+            currQueue = currQueue === startQueue ? endQueue : startQueue;
+            currParents = currParents === startParents ? endParents : startParents;
         }
     }
 };
@@ -339,15 +449,57 @@ const getRandomIndex = (arr) => {
     return Math.floor(Math.random() * arr.length)
 };
 
-const mazeDFS = new Maze(12, ctxDFS);
-const mazeBFS = new Maze(12, ctxBFS);
+let mazeDFS = new Maze(40, ctxDFS, delayedExecDfs);
+mazeDFS.generate()
+let mazeBFS = Maze.clone(mazeDFS, ctxBFS, delayedExecBfs)
+let mazeBDS = Maze.clone(mazeDFS, ctxBDS, delayedExecBds)
 
 mazeDFS.paint();
 mazeBFS.paint();
+mazeBDS.paint();
 
-const dfsPath = mazeDFS.depthFirstSearch('0,0', '11,11');
+let dfsPath = mazeDFS.depthFirstSearch();
+let bfsPath = mazeBFS.breadthFirstSearch();
+let bdsPath = mazeBDS.bidirectionalSearch();
 
-const bfsPath = mazeBFS.breadthFirstSearch('0,0', '11,11');
+mazeDFS.paintCorrectPath(dfsPath, '#d62828');
+mazeBFS.paintCorrectPath(bfsPath, '#d62828');
+mazeBDS.paintCorrectPath(bdsPath, '#d62828');
 
-mazeDFS.paintCorrectPath(dfsPath, 'green');
-mazeBFS.paintCorrectPath(bfsPath, 'green');
+refresh.onclick = function() {
+    ctxDFS.clearRect(0, 0, canvasDFS.width, canvasDFS.height);
+    ctxBFS.clearRect(0, 0, canvasBFS.width, canvasBFS.height);
+    ctxBDS.clearRect(0, 0, canvasBDS.width, canvasBDS.height);
+    delayedExecDfs = makeDelayedExec(speed);
+    delayedExecBfs = makeDelayedExec(speed);
+    delayedExecBds = makeDelayedExec(speed);
+
+    mazeDFS = new Maze(40, ctxDFS, delayedExecDfs);
+    mazeDFS.generate()
+    mazeBFS = Maze.clone(mazeDFS, ctxBFS, delayedExecBfs)
+    mazeBDS = Maze.clone(mazeDFS, ctxBDS, delayedExecBds)
+    
+    mazeDFS.paint();
+    mazeBFS.paint();
+    mazeBDS.paint();
+
+    dfsPath = mazeDFS.depthFirstSearch();
+    bfsPath = mazeBFS.breadthFirstSearch();
+    bdsPath = mazeBDS.bidirectionalSearch();
+
+    mazeDFS.paintCorrectPath(dfsPath, '#d62828');
+    mazeBFS.paintCorrectPath(bfsPath, '#d62828');
+    mazeBDS.paintCorrectPath(bdsPath, '#d62828');
+}
+
+incrementSpeed.onclick = function() {
+    speed += 1;
+    speedText.innerHTML = speed;
+}
+
+decrementSpeed.onclick = function() {
+    if (speed > 0) {
+        speed -= 1;
+        speedText.innerHTML = speed;
+    }
+}

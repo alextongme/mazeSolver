@@ -6,19 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maze Solver</title>
     <script type="text/javascript" src="./script.js" defer></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
+    
   </head>
   <body>
-    <h1>maze visualizer</h1>
+    <h1>THE MAZE ALGORITHM VISUALIZER</h1>
 
     <div class="container">
       <h2>(dfs) depth first search</h2>
-      <canvas id="canvas-dfs" height="1150" width="1150"></canvas>
+      <canvas id="canvas-dfs" height="395" width="395"></canvas>
+      <h3>algorithm starts at the root node and explores as far deep as possible along each branch before backtracking</h3>
     </div>
 
     <div class="container">
       <h2>(bfs) breadth first search</h2>
-      <canvas id="canvas-bfs" height="1150" width="1150"></canvas>
+      <canvas id="canvas-bfs" height="395" width="395"></canvas>
+      <h3>algorithm starts at the root node and explores all of its neighbor nodes at the present depth prior to moving on to the nodes at the next depth level</h3>
     </div>
+
+    <div class="container">
+      <h2>(bds) bidirectional breadth first search</h2>
+      <canvas id="canvas-bds" height="395" width="395"></canvas>
+      <h3>algorithm runs two simultaneous breadth first searches: one forward from the starting marker, and one backward from the ending marker, stopping once the two paths meet</h3>
+    </div>
+
+    <div id="bottom-container">
+      <h2>current speed: (lower is faster)</h2>
+      <div id="speed-container">
+        <button id="decrement">-</button>
+        <h2 id="speed"></h2>
+        <button id="increment">+</button>
+      </div>
+      <button id="refresh">generate new maze</button>
+    </div>
+
+    <footer>
+      <button onclick="location.href='https://www.tongsalex.com'" type="button">made by alex tong</button>
+    </footer>
 </body>
 </html>
