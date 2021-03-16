@@ -35,11 +35,11 @@
     </div>
 
     <div id="bottom-container">
-      <h2>current speed: (lower is faster)</h2>
+      <h2>current speed:</h2>
       <div id="speed-container">
-        <button id="decrement">-</button>
-        <h2 id="speed"></h2>
-        <button id="increment">+</button>
+        <div class="slidecontainer">
+          <input type="range" min="0" max="50" value="0" class="slider" id="myRange">
+        </div>
       </div>
       <button id="refresh">generate new maze</button>
     </div>

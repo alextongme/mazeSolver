@@ -3,7 +3,6 @@ const canvasDFS = document.getElementById('canvas-dfs');
 const canvasBFS = document.getElementById('canvas-bfs');
 const canvasBDS = document.getElementById('canvas-bds');
 const refresh = document.getElementById('refresh');
-const speedText = document.getElementById('speed');
 
 const incrementSpeed = document.getElementById('increment');
 const decrementSpeed = document.getElementById('decrement');
@@ -11,6 +10,8 @@ const decrementSpeed = document.getElementById('decrement');
 let ctxDFS = canvasDFS.getContext('2d');
 let ctxBFS = canvasBFS.getContext('2d');
 let ctxBDS = canvasBDS.getContext('2d');
+
+const globalQueue = [];
 
 const makeDelayedExec = (time) => {
     const queue = [];
@@ -23,9 +24,8 @@ const makeDelayedExec = (time) => {
       if (queue.length) {
         const fn = queue.shift();
         fn();
-        refresh.setAttribute('disabled', true);
+        globalQueue.push(intervalId)
       } else {
-        refresh.removeAttribute('disabled');
         clearInterval(intervalId);
       }
     }, time);
@@ -33,9 +33,7 @@ const makeDelayedExec = (time) => {
     return delayedPrint;
 };
 
-let speed = 10;
-
-speedText.innerHTML = speed;
+let speed = 0;
 
 let delayedExecDfs = makeDelayedExec(speed);
 let delayedExecBfs = makeDelayedExec(speed);
@@ -97,7 +95,7 @@ class Maze {
 
                     let currNode = this.grid[i][j];
                     if(currNode.start === true) {
-                        this.ctx.fillStyle = '#FFFF00';
+                        this.ctx.fillStyle = '#4666FF';
                     } else if (currNode.end === true) {
                         this.ctx.fillStyle = '#39ff14';
                     } else {
@@ -467,6 +465,10 @@ mazeBFS.paintCorrectPath(bfsPath, '#d62828');
 mazeBDS.paintCorrectPath(bdsPath, '#d62828');
 
 refresh.onclick = function() {
+    for(let i = 0; i < globalQueue.length; i++) {
+        clearInterval(globalQueue[i]);
+    }
+
     ctxDFS.clearRect(0, 0, canvasDFS.width, canvasDFS.height);
     ctxBFS.clearRect(0, 0, canvasBFS.width, canvasBFS.height);
     ctxBDS.clearRect(0, 0, canvasBDS.width, canvasBDS.height);
@@ -492,14 +494,8 @@ refresh.onclick = function() {
     mazeBDS.paintCorrectPath(bdsPath, '#d62828');
 }
 
-incrementSpeed.onclick = function() {
-    speed += 1;
-    speedText.innerHTML = speed;
-}
+const slider = document.getElementById("myRange");
 
-decrementSpeed.onclick = function() {
-    if (speed > 0) {
-        speed -= 1;
-        speedText.innerHTML = speed;
-    }
+slider.oninput = function() {
+    speed = this.value;
 }
