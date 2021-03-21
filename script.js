@@ -1,4 +1,3 @@
-// https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
 const canvasDFS = document.getElementById('canvas-dfs');
 const canvasBFS = document.getElementById('canvas-bfs');
 const canvasBDS = document.getElementById('canvas-bds');
@@ -47,7 +46,6 @@ const OPPOSITE_DIRECTION = {
     up: 'down'
 };
 
-
 class Maze {
     constructor(size, ctx, delayedExec) {
         this.delayedExec = delayedExec
@@ -73,7 +71,6 @@ class Maze {
 
     initializeGrid(size) {
         const newGrid = [];
-
         for(let i = 0; i < size; i++) {
             const row = [];
             for(let j = 0; j < size; j++) {
@@ -81,7 +78,6 @@ class Maze {
             }
             newGrid.push(row);
         };
-        
         return newGrid;
     };
 
@@ -92,7 +88,6 @@ class Maze {
     paint() {
         for(let i = 0; i < this.grid.length; i++) {
             for(let j = 0; j < this.grid[0].length; j++) {
-
                     let currNode = this.grid[i][j];
                     if(currNode.start === true) {
                         this.ctx.fillStyle = '#4666FF';
@@ -126,7 +121,7 @@ class Maze {
         }
     }
 
-    paintCorrectPath(keys, color) { // keys = {  '1,0':'left',    }
+    paintCorrectPath(keys, color) {
         for(let key of keys) {
             const [currKey, dir] = key;
             this.delayedExec(() => {
@@ -153,39 +148,30 @@ class Maze {
         }
     }
 
-    // https://docs.google.com/drawings/d/1dbx2Tohdpm7Wt8C6eBbP1Jqk89rAiVmKONdLA30c9YY/edit?usp=sharing
+    // *************************** AIRBNB CODING SAMPLE ***************************
     generate() { 
-        // prims algoritm, 
-        // takes a graph and creates a tree within the graph that spans all nodes, but only SOME edges
         const tree = new Set();
         tree.add('0,0');
         let edges = []; 
-        // at any point in time, edges will contains edges where the SOURCE is in the tree but the DEST
-        // is not in the tree
         edges.push(...this.getEdges(0, 0));
-        
-        // while the tree does not contain every node
+    
         while(tree.size < this.grid.length**2) {
             const chosenIndex = getRandomIndex(edges);
             const chosenEdge = edges[chosenIndex];
             edges.splice(chosenIndex, 1);
-
             const [ src, dir, dest ] = chosenEdge;
-          
             tree.add(dest);
 
             const srcPosition = this.keyToPosition(src);
             const srcNode = this.grid[srcPosition[0]][srcPosition[1]];
             srcNode[dir] = true;
-            
+
             const destPosition = this.keyToPosition(dest);
             const destNode = this.grid[destPosition[0]][destPosition[1]];
             destNode[OPPOSITE_DIRECTION[dir]] = true;
 
             edges.push(...this.getEdges(...destPosition));
 
-            // remove the edges of the edges array whose destination is ALREADY
-            // in the tree
             edges = edges.filter((edge) => {
                 const [ edgeSrc, edgeDir, edgeDest ] = edge;
                 if(tree.has(edgeDest)) {
@@ -196,7 +182,6 @@ class Maze {
         }
     }
 
-    // https://docs.google.com/drawings/d/1a0sk5EG8xGBJNUYUigDf6gBdIhwUuU6OJKhQFCjGBJc/edit?usp=sharing
     getEdges(row, col) {
         const edges = []
         if (row - 1 >= 0) {
@@ -281,7 +266,7 @@ class Maze {
         }
         
         const neighbors = this.getNeighbors(currKey);
-        for (let neighborKey in neighbors) { // {  '1,0':'left',    }
+        for (let neighborKey in neighbors) {
             const result = this.depthFirstSearch(neighborKey, targetKey, neighbors[neighborKey], visited);
             if (result.length > 0) {
                 return [[currKey, dir], ...result];
@@ -336,8 +321,6 @@ class Maze {
                 }
                 return path
             };
-
-            
 
             const neighbors = this.getNeighbors(currKey);
             for(let neighbor in neighbors) {
