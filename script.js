@@ -181,7 +181,6 @@ class Maze {
             });
         }
     }
-
     // *************************** AIRBNB CODING SAMPLE - END ***************************
 
     getEdges(row, col) {
