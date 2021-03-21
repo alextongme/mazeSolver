@@ -148,7 +148,7 @@ class Maze {
         }
     }
 
-    // *************************** AIRBNB CODING SAMPLE ***************************
+    // *************************** AIRBNB CODING SAMPLE - START ***************************
     generate() { 
         const tree = new Set();
         tree.add('0,0');
@@ -181,6 +181,8 @@ class Maze {
             });
         }
     }
+
+    // *************************** AIRBNB CODING SAMPLE - END ***************************
 
     getEdges(row, col) {
         const edges = []
