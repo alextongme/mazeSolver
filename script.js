@@ -13,10 +13,13 @@ const globalQueue = [];
 
 const makeDelayedExec = (time) => {
     const queue = [];
+    let onDrain = null;
 
     const delayedPrint = (cb) => {
         queue.push(cb);
     };
+
+    delayedPrint.onDrain = (cb) => { onDrain = cb; };
 
     const intervalId = setInterval(() => {
         if (queue.length) {
@@ -25,6 +28,7 @@ const makeDelayedExec = (time) => {
             globalQueue.push(intervalId);
         } else {
             clearInterval(intervalId);
+            if (onDrain) onDrain();
         }
     }, time);
 
@@ -554,16 +558,17 @@ function runMaze() {
     mazeBFS.paintCorrectPath(bfsPath, '#bd93f9');
     mazeBDS.paintCorrectPath(bdsPath, '#bd93f9');
 
-    // Highlight winner after all animations complete
-    // Total frames per algorithm = explored nodes + solution path nodes
-    const maxFrames = Math.max(
-        mazeDFS.nodesExplored + dfsPath.length,
-        mazeBFS.nodesExplored + bfsPath.length,
-        mazeBDS.nodesExplored + bdsPath.length
-    );
-    setTimeout(() => {
-        highlightWinner({ dfs: dfsTime, bfs: bfsTime, bds: bdsTime });
-    }, maxFrames * speed + 200);
+    // Highlight winner after all animation queues drain
+    let drained = 0;
+    const onAllDrained = () => {
+        drained++;
+        if (drained === 3) {
+            highlightWinner({ dfs: dfsTime, bfs: bfsTime, bds: bdsTime });
+        }
+    };
+    delayedExecDfs.onDrain(onAllDrained);
+    delayedExecBfs.onDrain(onAllDrained);
+    delayedExecBds.onDrain(onAllDrained);
 }
 
 // Initial run
