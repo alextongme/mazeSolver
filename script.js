@@ -37,7 +37,7 @@ let delayedExecDfs = makeDelayedExec(speed);
 let delayedExecBfs = makeDelayedExec(speed);
 let delayedExecBds = makeDelayedExec(speed);
 
-const POSITION_SIZE = 5;
+const POSITION_SIZE = 7;
 const OPPOSITE_DIRECTION = {
     left: 'right',
     right: 'left',
@@ -85,39 +85,95 @@ class Maze {
     }
 
     paint() {
+        // First pass: draw all paths
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[0].length; j++) {
                 let currNode = this.grid[i][j];
-                if (currNode.start === true) {
-                    this.ctx.fillStyle = '#8be9fd';
-                } else if (currNode.end === true) {
-                    this.ctx.fillStyle = '#50fa7b';
-                } else {
-                    this.ctx.fillStyle = '#f8f8f2';
-                }
-
                 let x = POSITION_SIZE * j * 2;
                 let y = POSITION_SIZE * i * 2;
+
+                this.ctx.fillStyle = '#44475a';
                 this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
 
                 if (currNode.up === true) {
-                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.down === true) {
-                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.left === true) {
-                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.right === true) {
-                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
             }
         }
+
+        this.drawMarkers();
+    }
+
+    drawMarkers() {
+        const r = POSITION_SIZE * 0.6;
+        const pad = POSITION_SIZE + 4;
+
+        // Start marker — pink glowing circle
+        const [sr, sc] = this.start;
+        const sx = POSITION_SIZE * sc * 2 + POSITION_SIZE / 2;
+        const sy = POSITION_SIZE * sr * 2 + POSITION_SIZE / 2;
+
+        // Clear area around start
+        this.ctx.fillStyle = '#282a36';
+        this.ctx.fillRect(sx - pad, sy - pad, pad * 2, pad * 2);
+
+        this.ctx.save();
+        this.ctx.shadowColor = '#ff79c6';
+        this.ctx.shadowBlur = 6;
+        this.ctx.fillStyle = '#ff79c6';
+        this.ctx.beginPath();
+        this.ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
+
+        // Inner dot
+        this.ctx.fillStyle = '#282a36';
+        this.ctx.beginPath();
+        this.ctx.arc(sx, sy, r * 0.35, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // End marker — green glowing diamond
+        const [er, ec] = this.end;
+        const ex = POSITION_SIZE * ec * 2 + POSITION_SIZE / 2;
+        const ey = POSITION_SIZE * er * 2 + POSITION_SIZE / 2;
+        const d = POSITION_SIZE * 0.65;
+
+        // Clear area around end
+        this.ctx.fillStyle = '#282a36';
+        this.ctx.fillRect(ex - pad, ey - pad, pad * 2, pad * 2);
+
+        this.ctx.save();
+        this.ctx.shadowColor = '#50fa7b';
+        this.ctx.shadowBlur = 6;
+        this.ctx.fillStyle = '#50fa7b';
+        this.ctx.beginPath();
+        this.ctx.moveTo(ex, ey - d);
+        this.ctx.lineTo(ex + d, ey);
+        this.ctx.lineTo(ex, ey + d);
+        this.ctx.lineTo(ex - d, ey);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.restore();
+
+        // Inner diamond
+        this.ctx.fillStyle = '#282a36';
+        this.ctx.beginPath();
+        const di = d * 0.35;
+        this.ctx.moveTo(ex, ey - di);
+        this.ctx.lineTo(ex + di, ey);
+        this.ctx.lineTo(ex, ey + di);
+        this.ctx.lineTo(ex - di, ey);
+        this.ctx.closePath();
+        this.ctx.fill();
     }
 
     paintCorrectPath(keys, color) {
@@ -143,6 +199,7 @@ class Maze {
                 if (dir === 'right') {
                     this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
+                this.drawMarkers();
             });
         }
     }
@@ -236,7 +293,7 @@ class Maze {
             const x = POSITION_SIZE * col * 2;
             const y = POSITION_SIZE * row * 2;
             if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                this.ctx.fillStyle = "#ffb86c";
+                this.ctx.fillStyle = "#6272a4";
                 this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
             }
             if (dir === 'up') {
@@ -251,6 +308,7 @@ class Maze {
             if (dir === 'right') {
                 this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
             }
+            this.drawMarkers();
         });
 
         if (currKey === targetKey) {
@@ -284,7 +342,7 @@ class Maze {
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    this.ctx.fillStyle = "#ffb86c";
+                    this.ctx.fillStyle = "#6272a4";
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (dir === 'up') {
@@ -351,7 +409,7 @@ class Maze {
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    this.ctx.fillStyle = "#ffb86c";
+                    this.ctx.fillStyle = "#6272a4";
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (dir === 'up') {
@@ -421,9 +479,27 @@ const getRandomIndex = (arr) => {
     return Math.floor(Math.random() * arr.length);
 };
 
-function updateStats(maze, path, prefix) {
+function updateStats(maze, path, solveTime, prefix) {
     document.getElementById('explored-' + prefix).textContent = maze.nodesExplored;
     document.getElementById('path-' + prefix).textContent = path ? path.length : '--';
+    document.getElementById('time-' + prefix).textContent = solveTime.toFixed(2) + 'ms';
+    document.getElementById('stats-' + prefix).classList.add('solved');
+    // Remove any previous winner highlight
+    document.querySelector('.card[data-algo="' + prefix + '"]').classList.remove('winner');
+}
+
+function highlightWinner(times) {
+    let minTime = Infinity;
+    let winnerPrefix = null;
+    for (const [prefix, time] of Object.entries(times)) {
+        if (time < minTime) {
+            minTime = time;
+            winnerPrefix = prefix;
+        }
+    }
+    if (winnerPrefix) {
+        document.querySelector('.card[data-algo="' + winnerPrefix + '"]').classList.add('winner');
+    }
 }
 
 function runMaze() {
@@ -435,6 +511,10 @@ function runMaze() {
     ctxDFS.clearRect(0, 0, canvasDFS.width, canvasDFS.height);
     ctxBFS.clearRect(0, 0, canvasBFS.width, canvasBFS.height);
     ctxBDS.clearRect(0, 0, canvasBDS.width, canvasBDS.height);
+
+    document.getElementById('stats-dfs').classList.remove('solved');
+    document.getElementById('stats-bfs').classList.remove('solved');
+    document.getElementById('stats-bds').classList.remove('solved');
 
     delayedExecDfs = makeDelayedExec(speed);
     delayedExecBfs = makeDelayedExec(speed);
@@ -449,17 +529,41 @@ function runMaze() {
     mazeBFS.paint();
     mazeBDS.paint();
 
+    let t0, t1;
+
+    t0 = performance.now();
     let dfsPath = mazeDFS.depthFirstSearch();
+    t1 = performance.now();
+    const dfsTime = t1 - t0;
+
+    t0 = performance.now();
     let bfsPath = mazeBFS.breadthFirstSearch();
+    t1 = performance.now();
+    const bfsTime = t1 - t0;
+
+    t0 = performance.now();
     let bdsPath = mazeBDS.bidirectionalSearch();
+    t1 = performance.now();
+    const bdsTime = t1 - t0;
 
-    updateStats(mazeDFS, dfsPath, 'dfs');
-    updateStats(mazeBFS, bfsPath, 'bfs');
-    updateStats(mazeBDS, bdsPath, 'bds');
+    updateStats(mazeDFS, dfsPath, dfsTime, 'dfs');
+    updateStats(mazeBFS, bfsPath, bfsTime, 'bfs');
+    updateStats(mazeBDS, bdsPath, bdsTime, 'bds');
 
-    mazeDFS.paintCorrectPath(dfsPath, '#ff79c6');
-    mazeBFS.paintCorrectPath(bfsPath, '#ff79c6');
-    mazeBDS.paintCorrectPath(bdsPath, '#ff79c6');
+    mazeDFS.paintCorrectPath(dfsPath, '#bd93f9');
+    mazeBFS.paintCorrectPath(bfsPath, '#bd93f9');
+    mazeBDS.paintCorrectPath(bdsPath, '#bd93f9');
+
+    // Highlight winner after all animations complete
+    // Total frames per algorithm = explored nodes + solution path nodes
+    const maxFrames = Math.max(
+        mazeDFS.nodesExplored + dfsPath.length,
+        mazeBFS.nodesExplored + bfsPath.length,
+        mazeBDS.nodesExplored + bdsPath.length
+    );
+    setTimeout(() => {
+        highlightWinner({ dfs: dfsTime, bfs: bfsTime, bds: bdsTime });
+    }, maxFrames * speed + 200);
 }
 
 // Initial run

@@ -59,29 +59,29 @@
 
     <div class="legend">
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#8be9fd"></span>
+            <span class="legend-swatch legend-circle" style="background:#ff79c6"></span>
             <span>Start</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#50fa7b"></span>
+            <span class="legend-swatch legend-diamond" style="background:#50fa7b"></span>
             <span>End</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#f8f8f2"></span>
+            <span class="legend-swatch" style="background:#44475a"></span>
             <span>Maze Path</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#ffb86c"></span>
+            <span class="legend-swatch" style="background:#6272a4"></span>
             <span>Explored</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#ff79c6"></span>
+            <span class="legend-swatch" style="background:#bd93f9"></span>
             <span>Solution</span>
         </div>
     </div>
 
     <main class="grid">
-        <article class="card" style="--delay: 0">
+        <article class="card" data-algo="dfs" style="--delay: 0">
             <div class="card-header">
                 <div class="card-badge">01</div>
                 <div>
@@ -90,11 +90,7 @@
                 </div>
             </div>
             <div class="canvas-wrap">
-                <canvas id="canvas-dfs" height="395" width="395"></canvas>
-                <div class="canvas-corner tl"></div>
-                <div class="canvas-corner tr"></div>
-                <div class="canvas-corner bl"></div>
-                <div class="canvas-corner br"></div>
+                <canvas id="canvas-dfs" height="559" width="559"></canvas>
             </div>
             <div class="stats" id="stats-dfs">
                 <div class="stat">
@@ -102,14 +98,18 @@
                     <span class="stat-value" id="explored-dfs">--</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">Path Length</span>
+                    <span class="stat-label">Path</span>
                     <span class="stat-value" id="path-dfs">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span class="stat-value" id="time-dfs">--</span>
                 </div>
             </div>
             <p class="card-desc">Explores as deep as possible along each branch before backtracking. Trades optimality for memory efficiency.</p>
         </article>
 
-        <article class="card" style="--delay: 1">
+        <article class="card" data-algo="bfs" style="--delay: 1">
             <div class="card-header">
                 <div class="card-badge">02</div>
                 <div>
@@ -118,11 +118,7 @@
                 </div>
             </div>
             <div class="canvas-wrap">
-                <canvas id="canvas-bfs" height="395" width="395"></canvas>
-                <div class="canvas-corner tl"></div>
-                <div class="canvas-corner tr"></div>
-                <div class="canvas-corner bl"></div>
-                <div class="canvas-corner br"></div>
+                <canvas id="canvas-bfs" height="559" width="559"></canvas>
             </div>
             <div class="stats" id="stats-bfs">
                 <div class="stat">
@@ -130,14 +126,18 @@
                     <span class="stat-value" id="explored-bfs">--</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">Path Length</span>
+                    <span class="stat-label">Path</span>
                     <span class="stat-value" id="path-bfs">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span class="stat-value" id="time-bfs">--</span>
                 </div>
             </div>
             <p class="card-desc">Explores all neighbors at the current depth before moving deeper. Guarantees the shortest path.</p>
         </article>
 
-        <article class="card" style="--delay: 2">
+        <article class="card" data-algo="bds" style="--delay: 2">
             <div class="card-header">
                 <div class="card-badge">03</div>
                 <div>
@@ -146,11 +146,7 @@
                 </div>
             </div>
             <div class="canvas-wrap">
-                <canvas id="canvas-bds" height="395" width="395"></canvas>
-                <div class="canvas-corner tl"></div>
-                <div class="canvas-corner tr"></div>
-                <div class="canvas-corner bl"></div>
-                <div class="canvas-corner br"></div>
+                <canvas id="canvas-bds" height="559" width="559"></canvas>
             </div>
             <div class="stats" id="stats-bds">
                 <div class="stat">
@@ -158,8 +154,12 @@
                     <span class="stat-value" id="explored-bds">--</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">Path Length</span>
+                    <span class="stat-label">Path</span>
                     <span class="stat-value" id="path-bds">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span class="stat-value" id="time-bds">--</span>
                 </div>
             </div>
             <p class="card-desc">Two simultaneous searches from start and end, meeting in the middle. Dramatically reduces search space.</p>
