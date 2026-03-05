@@ -7,12 +7,25 @@
     <title>Maze Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="scanlines"></div>
+    <div class="fog-wrapper">
+        <div class="fog-layer fog-layer-1">
+            <div class="fog-img fog-1"></div>
+            <div class="fog-img fog-1"></div>
+        </div>
+        <div class="fog-layer fog-layer-2">
+            <div class="fog-img fog-2"></div>
+            <div class="fog-img fog-2"></div>
+        </div>
+        <div class="fog-layer fog-layer-3">
+            <div class="fog-img fog-2"></div>
+            <div class="fog-img fog-2"></div>
+        </div>
+    </div>
 
     <header>
         <div class="header-top">
@@ -44,23 +57,23 @@
 
     <div class="legend">
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#4666FF"></span>
+            <span class="legend-swatch" style="background:#8be9fd"></span>
             <span>Start</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#39ff14"></span>
+            <span class="legend-swatch" style="background:#50fa7b"></span>
             <span>End</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#eae2b7"></span>
+            <span class="legend-swatch" style="background:#f8f8f2"></span>
             <span>Maze Path</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#f77f00"></span>
+            <span class="legend-swatch" style="background:#ffb86c"></span>
             <span>Explored</span>
         </div>
         <div class="legend-item">
-            <span class="legend-swatch" style="background:#d62828"></span>
+            <span class="legend-swatch" style="background:#ff79c6"></span>
             <span>Solution</span>
         </div>
     </div>

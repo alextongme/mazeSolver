@@ -89,11 +89,11 @@ class Maze {
             for (let j = 0; j < this.grid[0].length; j++) {
                 let currNode = this.grid[i][j];
                 if (currNode.start === true) {
-                    this.ctx.fillStyle = '#4666FF';
+                    this.ctx.fillStyle = '#8be9fd';
                 } else if (currNode.end === true) {
-                    this.ctx.fillStyle = '#39ff14';
+                    this.ctx.fillStyle = '#50fa7b';
                 } else {
-                    this.ctx.fillStyle = '#eae2b7';
+                    this.ctx.fillStyle = '#f8f8f2';
                 }
 
                 let x = POSITION_SIZE * j * 2;
@@ -101,19 +101,19 @@ class Maze {
                 this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
 
                 if (currNode.up === true) {
-                    this.ctx.fillStyle = '#eae2b7';
+                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x, y - POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.down === true) {
-                    this.ctx.fillStyle = '#eae2b7';
+                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x, y + POSITION_SIZE, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.left === true) {
-                    this.ctx.fillStyle = '#eae2b7';
+                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x - POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (currNode.right === true) {
-                    this.ctx.fillStyle = '#eae2b7';
+                    this.ctx.fillStyle = '#f8f8f2';
                     this.ctx.fillRect(x + POSITION_SIZE, y, POSITION_SIZE, POSITION_SIZE);
                 }
             }
@@ -236,7 +236,7 @@ class Maze {
             const x = POSITION_SIZE * col * 2;
             const y = POSITION_SIZE * row * 2;
             if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                this.ctx.fillStyle = "#f77f00";
+                this.ctx.fillStyle = "#ffb86c";
                 this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
             }
             if (dir === 'up') {
@@ -284,7 +284,7 @@ class Maze {
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    this.ctx.fillStyle = "#f77f00";
+                    this.ctx.fillStyle = "#ffb86c";
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (dir === 'up') {
@@ -351,7 +351,7 @@ class Maze {
                 const x = POSITION_SIZE * col * 2;
                 const y = POSITION_SIZE * row * 2;
                 if (this.grid[row][col].start === false && this.grid[row][col].end === false) {
-                    this.ctx.fillStyle = "#f77f00";
+                    this.ctx.fillStyle = "#ffb86c";
                     this.ctx.fillRect(x, y, POSITION_SIZE, POSITION_SIZE);
                 }
                 if (dir === 'up') {
@@ -457,9 +457,9 @@ function runMaze() {
     updateStats(mazeBFS, bfsPath, 'bfs');
     updateStats(mazeBDS, bdsPath, 'bds');
 
-    mazeDFS.paintCorrectPath(dfsPath, '#d62828');
-    mazeBFS.paintCorrectPath(bfsPath, '#d62828');
-    mazeBDS.paintCorrectPath(bdsPath, '#d62828');
+    mazeDFS.paintCorrectPath(dfsPath, '#ff79c6');
+    mazeBFS.paintCorrectPath(bfsPath, '#ff79c6');
+    mazeBDS.paintCorrectPath(bdsPath, '#ff79c6');
 }
 
 // Initial run
