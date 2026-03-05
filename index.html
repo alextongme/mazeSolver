@@ -2,52 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:image" content="https://github.com/alextongme/mazeSolver/blob/master/maze.png?raw=true">
-
-    <title>The Maze</title>
-    <script type="text/javascript" src="./script.js" defer></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Maze Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    
-  </head>
-  <body>
-    <h1>THE MAZE ALGORITHM VISUALIZER</h1>
+    <div class="scanlines"></div>
 
-    <div class="container">
-      <h2>(dfs) depth first search</h2>
-      <canvas id="canvas-dfs" height="395" width="395"></canvas>
-      <h3>algorithm starts at the root node and explores as far deep as possible along each branch before backtracking</h3>
-    </div>
-
-    <div class="container">
-      <h2>(bfs) breadth first search</h2>
-      <canvas id="canvas-bfs" height="395" width="395"></canvas>
-      <h3>algorithm starts at the root node and explores all of its neighbor nodes at the present depth prior to moving on to the nodes at the next depth level</h3>
-    </div>
-
-    <div class="container">
-      <h2>(bds) bidirectional breadth first search</h2>
-      <canvas id="canvas-bds" height="395" width="395"></canvas>
-      <h3>algorithm runs two simultaneous breadth first searches: one forward from the starting marker, and one backward from the ending marker, stopping once the two paths meet</h3>
-    </div>
-
-    <div id="bottom-container">
-      <h2>current speed:</h2>
-      <div id="speed-container">
-        <div class="slidecontainer">
-          <input type="range" min="0" max="50" value="0" class="slider" id="myRange">
+    <header>
+        <div class="header-top">
+            <div class="header-label">SYS:ACTIVE</div>
+            <h1>MAZE<span class="accent">LAB</span></h1>
+            <div class="header-label">v2.0</div>
         </div>
-      </div>
-      <button id="refresh">generate new maze</button>
+        <p class="subtitle">Algorithm Pathfinding Visualizer</p>
+    </header>
+
+    <section class="controls">
+        <div class="control-group">
+            <label class="control-label" for="myRange">Animation Delay</label>
+            <div class="slider-row">
+                <span class="slider-value" id="speed-display">0ms</span>
+                <input type="range" min="0" max="50" value="0" class="slider" id="myRange">
+                <span class="slider-bound">50ms</span>
+            </div>
+        </div>
+        <div class="control-buttons">
+            <button id="refresh">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M13.65 2.35A8 8 0 1 0 16 8h-2a6 6 0 1 1-1.76-4.24L10 6h6V0l-2.35 2.35z" fill="currentColor"/>
+                </svg>
+                Generate Maze
+            </button>
+        </div>
+    </section>
+
+    <div class="legend">
+        <div class="legend-item">
+            <span class="legend-swatch" style="background:#4666FF"></span>
+            <span>Start</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch" style="background:#39ff14"></span>
+            <span>End</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch" style="background:#eae2b7"></span>
+            <span>Maze Path</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch" style="background:#f77f00"></span>
+            <span>Explored</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch" style="background:#d62828"></span>
+            <span>Solution</span>
+        </div>
     </div>
+
+    <main class="grid">
+        <article class="card" style="--delay: 0">
+            <div class="card-header">
+                <div class="card-badge">01</div>
+                <div>
+                    <h2>Depth First Search</h2>
+                    <span class="card-tag">DFS</span>
+                </div>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="canvas-dfs" height="395" width="395"></canvas>
+                <div class="canvas-corner tl"></div>
+                <div class="canvas-corner tr"></div>
+                <div class="canvas-corner bl"></div>
+                <div class="canvas-corner br"></div>
+            </div>
+            <div class="stats" id="stats-dfs">
+                <div class="stat">
+                    <span class="stat-label">Explored</span>
+                    <span class="stat-value" id="explored-dfs">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Path Length</span>
+                    <span class="stat-value" id="path-dfs">--</span>
+                </div>
+            </div>
+            <p class="card-desc">Explores as deep as possible along each branch before backtracking. Trades optimality for memory efficiency.</p>
+        </article>
+
+        <article class="card" style="--delay: 1">
+            <div class="card-header">
+                <div class="card-badge">02</div>
+                <div>
+                    <h2>Breadth First Search</h2>
+                    <span class="card-tag">BFS</span>
+                </div>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="canvas-bfs" height="395" width="395"></canvas>
+                <div class="canvas-corner tl"></div>
+                <div class="canvas-corner tr"></div>
+                <div class="canvas-corner bl"></div>
+                <div class="canvas-corner br"></div>
+            </div>
+            <div class="stats" id="stats-bfs">
+                <div class="stat">
+                    <span class="stat-label">Explored</span>
+                    <span class="stat-value" id="explored-bfs">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Path Length</span>
+                    <span class="stat-value" id="path-bfs">--</span>
+                </div>
+            </div>
+            <p class="card-desc">Explores all neighbors at the current depth before moving deeper. Guarantees the shortest path.</p>
+        </article>
+
+        <article class="card" style="--delay: 2">
+            <div class="card-header">
+                <div class="card-badge">03</div>
+                <div>
+                    <h2>Bidirectional BFS</h2>
+                    <span class="card-tag">BDS</span>
+                </div>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="canvas-bds" height="395" width="395"></canvas>
+                <div class="canvas-corner tl"></div>
+                <div class="canvas-corner tr"></div>
+                <div class="canvas-corner bl"></div>
+                <div class="canvas-corner br"></div>
+            </div>
+            <div class="stats" id="stats-bds">
+                <div class="stat">
+                    <span class="stat-label">Explored</span>
+                    <span class="stat-value" id="explored-bds">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Path Length</span>
+                    <span class="stat-value" id="path-bds">--</span>
+                </div>
+            </div>
+            <p class="card-desc">Two simultaneous searches from start and end, meeting in the middle. Dramatically reduces search space.</p>
+        </article>
+    </main>
 
     <footer>
-      <button onclick="location.href='https://www.tongsalex.com'" type="button">made by alex tong</button>
+        <span class="footer-line"></span>
+        <a href="https://www.tongsalex.com" class="footer-link">Built by Alex Tong</a>
+        <span class="footer-line"></span>
     </footer>
+
+    <script src="./script.js" defer></script>
 </body>
 </html>
